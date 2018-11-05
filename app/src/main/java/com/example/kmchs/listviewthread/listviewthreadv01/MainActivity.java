@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //commit test
+        //commit test 2
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         dataSaver= sharedPref.getBoolean("thumbnail",true);

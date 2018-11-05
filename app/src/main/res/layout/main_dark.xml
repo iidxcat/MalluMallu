@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".MainActivity"
+    android:id="@+id/rLayout"
+    android:background="#000000">
+
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit"
+        android:hint="검색"
+        android:textColorHint="#FFEEE4"
+        android:textColor="#FFEEE4"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="검색"
+        android:id="@+id/button"
+        android:layout_alignParentRight="true"
+        />
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/progress"
+        android:layout_centerInParent="true"
+        />
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swipe_layout"
+        android:layout_below="@id/edit">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/listview1"
+            android:divider="#CE6D39"
+            >
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+</RelativeLayout>

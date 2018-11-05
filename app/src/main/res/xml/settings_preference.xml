@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="thumbnail"
+        android:summary="한 페이지당 10MB정도를 절약할 수 있습니다."
+        android:title="데이터 사용중일땐 썸네일 불러오지 않기"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="zoom"
+        android:title="줌 활성화"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="blackTheme"
+        android:title="어두운 테마 사용하기"/>
+    <PreferenceCategory android:title="모든 설정은 재시작시 적용됩니다"></PreferenceCategory>
+
+</PreferenceScreen>

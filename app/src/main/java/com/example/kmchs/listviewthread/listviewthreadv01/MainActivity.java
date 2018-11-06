@@ -67,28 +67,21 @@ public class MainActivity extends AppCompatActivity {
     boolean isSearch=false;
     boolean isUsingData=false;
     boolean dataSaver=false;
+    SharedPreferences sharedPref;
+    Context context;
 
     ListView listview;
     ListViewAdapter adapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //commit test 2
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        //초기설정
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         dataSaver= sharedPref.getBoolean("thumbnail",true);
-        if(!sharedPref.getBoolean("blackTheme",false))
-            setContentView(R.layout.activity_main);
-        else {
-            setContentView(R.layout.main_dark);
-            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.darkPrimary)));
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkSecondary));
-        }
-        setTitle("머루머루");
-        onBackPressedExit=new OnBackPressedExit(this);
         Context context=getApplicationContext();
-
+        setTheme();
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null) {
@@ -104,13 +97,10 @@ public class MainActivity extends AppCompatActivity {
             // not connected to the internet
             Toast.makeText(this, "네트워크가 꺼져있습니다.", Toast.LENGTH_SHORT).show();
         }
-
-        titleString=new ArrayList<String>();
-        dateString=new ArrayList<String>();
-        thumbnailString=new ArrayList<String>();
-        urlString=new ArrayList<String>();
+        checkNetworkStatus();
         myRequestQueue = Volley.newRequestQueue(this);
 
+        //스와이프레이아웃 구현
         final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -120,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //리스트뷰 구현
         View footer = getLayoutInflater().inflate(R.layout.listview_footer, null, false);
         listview=(ListView) findViewById(R.id.listview1);
         listview.addFooterView(footer);
@@ -131,9 +122,11 @@ public class MainActivity extends AppCompatActivity {
         edittext=(EditText)findViewById(R.id.edit);
         progressBar=(ProgressBar) findViewById(R.id.progress);
 
+        //처음 새로고침
         refresh("page=","1",false);
         Log.e("refresh finished","refresh");
 
+        //더보기 클릭리스너
         moretext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //검색버튼 클릭리스너
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    //새로고침 메소드
     public void refresh(String type,String value, boolean isClear)
     {
         progressBar.setVisibility(View.VISIBLE);
@@ -285,6 +281,8 @@ public class MainActivity extends AppCompatActivity {
         myRequestQueue.add(myRequest);
 
     }
+
+    //화수 팝업
     void show()
     {
         final CharSequence[] items =  episodeString.toArray(new String[ episodeString.size()]);
@@ -376,5 +374,20 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    private void setTheme ()
+    {
+        if(!sharedPref.getBoolean("blackTheme",false))
+            setContentView(R.layout.activity_main);
+        else {
+            setContentView(R.layout.main_dark);
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.darkPrimary)));
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkSecondary));
+        }
+        setTitle("머루머루");
+        onBackPressedExit=new OnBackPressedExit(this);
+    }
+    private void checkNetworkStatus()
+    {
 
+    }
 }

@@ -4,9 +4,7 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/history"
-            android:title="기록" />
+
 
     </group>
 
@@ -14,85 +12,85 @@
         <menu>
             <item
                 android:id="@+id/d1"
-                android:title="" />
+                android:title="완결" />
             <item
                 android:id="@+id/d2"
-                android:title="" />
+                android:title="액션" />
             <item
                 android:id="@+id/d3"
-                android:title="" />
+                android:title="이세계" />
             <item
                 android:id="@+id/d4"
-                android:title="" />
+                android:title="일상치유" />
             <item
                 android:id="@+id/d5"
-                android:title="" />
+                android:title="전생" />
             <item
                 android:id="@+id/d6"
-                android:title="" />
+                android:title="추리" />
             <item
                 android:id="@+id/d7"
-                android:title="" />
+                android:title="판타지" />
             <item
                 android:id="@+id/d8"
-                android:title="" />
+                android:title="학원" />
             <item
                 android:id="@+id/d9"
-                android:title="" />
+                android:title="공포" />
             <item
                 android:id="@+id/d10"
-                android:title="" />
+                android:title="개그" />
             <item
                 android:id="@+id/d11"
-                android:title="" />
+                android:title="게임" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d12"
+                android:title="도박" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d13"
+                android:title="드라마" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d14"
+                android:title="라노벨" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d15"
+                android:title="러브코미디" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d16"
+                android:title="먹방" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d17"
+                android:title="백합" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d18"
+                android:title="여장" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d19"
+                android:title="순정" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d20"
+                android:title="스릴러" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d21"
+                android:title="스포츠" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d22"
+                android:title="17" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d23"
+                android:title="BL" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d24"
+                android:title="역사" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d25"
+                android:title="SF" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d26"
+                android:title="TS" />
             <item
-                android:id="@+id/"
-                android:title="" />
+                android:id="@+id/d27"
+                android:title="애니화" />
         </menu>
     </item>
 

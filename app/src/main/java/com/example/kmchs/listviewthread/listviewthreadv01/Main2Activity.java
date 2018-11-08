@@ -72,19 +72,33 @@ public class Main2Activity extends AppCompatActivity
     int page=2;
     int searchPage=1;
     boolean isFirstRefresh=true;
-    boolean isSearch=false;
+    int searchState=0;
     boolean isUsingData=false;
     boolean dataSaver=false;
     SharedPreferences sharedPref;
     Context context;
+    String genre=null;
+    final int nowVersion=1001;
 
     ListView listview;
     ListViewAdapter adapter;
+    View footer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        dataSaver= sharedPref.getBoolean("thumbnail",true);
+        Context context=getApplicationContext();
+
+
+        if(!sharedPref.getBoolean("blackTheme",false))
+            setContentView(R.layout.activity_main2);
+        else {
+            setContentView(R.layout.activity_main2_dark);
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkSecondary));
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("머루머루");
@@ -98,19 +112,6 @@ public class Main2Activity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        dataSaver= sharedPref.getBoolean("thumbnail",true);
-        Context context=getApplicationContext();
-
-
-        /*if(!sharedPref.getBoolean("blackTheme",false))
-            setContentView(R.layout.activity_main2);
-        else {
-            //setContentView(R.layout.main_dark);
-            setContentView(R.layout.activity_main2);
-            //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.darkPrimary)));
-            //getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkSecondary));
-        }*/
         onBackPressedExit=new OnBackPressedExit(this);
 
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -135,16 +136,22 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public void onRefresh() {
                 refresh("page=","1",true);
+                searchState=0;
+                page=2;
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
 
         //리스트뷰 구현
-        View footer = getLayoutInflater().inflate(R.layout.listview_footer, null, false);
+        if(!sharedPref.getBoolean("blackTheme",false))
+            footer = getLayoutInflater().inflate(R.layout.listview_footer, null, false);
+        else
+            footer=getLayoutInflater().inflate(R.layout.listview_footer_dark, null, false);
         listview=(ListView) findViewById(R.id.listview1);
         listview.addFooterView(footer);
         listview.setAdapter(adapter);
         adapter=new ListViewAdapter(this);
+        footer.setVisibility(View.GONE);
 
         Button button=(Button)findViewById(R.id.button);
         TextView moretext=(TextView)findViewById(R.id.moretext);
@@ -159,13 +166,16 @@ public class Main2Activity extends AppCompatActivity
         moretext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isSearch) {
+                if(searchState==0) {
                     refresh("page=", String.valueOf(page), false);
                     page++;
                 }
-                else
-                {
+                else if(searchState==1) {
                     refresh("search_val=",edittext.getText().toString()+"&page="+String.valueOf(searchPage),false);
+                    searchPage++;
+                }
+                else {
+                    refresh("search_val=",genre+"&page="+String.valueOf(searchPage),false);
                     searchPage++;
                 }
             }
@@ -176,7 +186,7 @@ public class Main2Activity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 refresh("search_val=", edittext.getText().toString(), true);
-                isSearch=true;
+                searchState=1;
                 searchPage=2;
             }
         });
@@ -218,7 +228,32 @@ public class Main2Activity extends AppCompatActivity
             }
         }) ;
 
+        //업데이트 체크
+        StringRequest updateCheck=new StringRequest(Request.Method.GET, "https://raw.githubusercontent.com/iidxcat/MalluMallu/master/version.txt",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String rawVersion=Jsoup.parse(response).text();
 
+                        StringBuilder updateBuilder=new StringBuilder(rawVersion);
+                        updateBuilder.delete(0,5);
+                        int isForceUpdate=Integer.parseInt(updateBuilder.toString());
+                        updateBuilder=new StringBuilder(rawVersion);
+                        updateBuilder.delete(4,6);
+
+                        int lastVersion=Integer.parseInt(updateBuilder.toString());
+                        if(nowVersion<lastVersion)
+                            Toast.makeText(Main2Activity.this, "업데이트가 있습니다.", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(Main2Activity.this, "최신버전 입니다.", Toast.LENGTH_SHORT).show();
+
+                        if(isForceUpdate==1) {
+                            Toast.makeText(Main2Activity.this, "업데이트 후 실행해주세요.", Toast.LENGTH_LONG).show();
+                            finish();
+                        }
+                    }
+                },null);
+        myRequestQueue.add(updateCheck);
     }
 
     public void refresh(String type,String value, boolean isClear)
@@ -297,6 +332,7 @@ public class Main2Activity extends AppCompatActivity
                             isFirstRefresh=false;
                         }
                         progressBar.setVisibility(View.GONE);
+                        footer.setVisibility(View.VISIBLE);
                     }
 
                 }, new Response.ErrorListener() {
@@ -304,6 +340,7 @@ public class Main2Activity extends AppCompatActivity
             public void onErrorResponse(VolleyError error) {
                 Log.e("Volley Error!","Text Parsing Error");
                 progressBar.setVisibility(View.GONE);
+                footer.setVisibility(View.VISIBLE);
             }
         });
         myRequestQueue.add(myRequest);
@@ -314,8 +351,8 @@ public class Main2Activity extends AppCompatActivity
     void show()
     {
         final CharSequence[] items =  episodeString.toArray(new String[ episodeString.size()]);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(this);
         builder.setTitle("선택");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int pos) {
@@ -418,18 +455,162 @@ public class Main2Activity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.d1) {
+            refresh("search_val=","*완결", true);
+            searchState=2;
+            genre="*완결";
+            searchPage=2;
+        } else if (id == R.id.d2) {
+            refresh("search_val=","*액션", true);
+            searchState=2;
+            genre="*액션";
+            searchPage=2;
+        } else if (id == R.id.d3) {
+            refresh("search_val=","*이세계", true);
+            searchState=2;
+            genre="*이세계";
+            searchPage=2;
+        } else if (id == R.id.d4) {
+            refresh("search_val=","*일상치유", true);
+            searchState=2;
+            genre="*일상치유";
+            searchPage=2;
+        } else if (id == R.id.d5) {
+            refresh("search_val=","*전생", true);
+            searchState=2;
+            genre="*전생";
+            searchPage=2;
+        } else if (id == R.id.d6) {
+            refresh("search_val=","*추리", true);
+            searchState=2;
+            genre="*추리";
+            searchPage=2;
+        }
+        else if (id == R.id.d7) {
+            refresh("search_val=","*판타지", true);
+            searchState=2;
+            genre="*판타지";
+            searchPage=2;
+        }
+        else if (id == R.id.d8) {
+            refresh("search_val=","*학원", true);
+            searchState=2;
+            genre="*학원";
+            searchPage=2;
+        }
+        else if (id == R.id.d9) {
+            refresh("search_val=","*공포", true);
+            searchState=2;
+            genre="*공포";
+            searchPage=2;
+        }
+        else if (id == R.id.d10) {
+            refresh("search_val=","*개그", true);
+            searchState=2;
+            genre="*개그";
+            searchPage=2;
+        }
+        else if (id == R.id.d11) {
+            refresh("search_val=","*게임", true);
+            searchState=2;
+            genre="*게임";
+            searchPage=2;
+        }
+        else if (id == R.id.d12) {
+            refresh("search_val=","*도박", true);
+            searchState=2;
+            genre="*도박";
+            searchPage=2;
+        }
+        else if (id == R.id.d13) {
+            refresh("search_val=","*드라마", true);
+            searchState=2;
+            genre="*드라마";
+            searchPage=2;
+        }
+        else if (id == R.id.d14) {
+            refresh("search_val=","*라노벨", true);
+            searchState=2;
+            genre="*라노벨";
+            searchPage=2;
+        }
+        else if (id == R.id.d15) {
+            refresh("search_val=","*러브코미디", true);
+            searchState=2;
+            genre="*러브코미디";
+            searchPage=2;
+        }
+        else if (id == R.id.d16) {
+            refresh("search_val=","*먹방", true);
+            searchState=2;
+            genre="*먹방";
+            searchPage=2;
+        }
+        else if (id == R.id.d17) {
+            refresh("search_val=","*백합", true);
+            searchState=2;
+            genre="*백합";
+            searchPage=2;
+        }
+        else if (id == R.id.d18) {
+            refresh("search_val=","*여장", true);
+            searchState=2;
+            genre="*여장";
+            searchPage=2;
+        }
+        else if (id == R.id.d19) {
+            refresh("search_val=","*순정", true);
+            searchState=2;
+            genre="*순정";
+            searchPage=2;
+        }
+        else if (id == R.id.d20) {
+            refresh("search_val=","*스릴러", true);
+            searchState=2;
+            genre="*스릴러";
+            searchPage=2;
+        }
+        else if (id == R.id.d21) {
+            refresh("search_val=","*스포츠", true);
+            searchState=2;
+            genre="*스포츠";
+            searchPage=2;
+        }
+        else if (id == R.id.d22) {
+            refresh("search_val=","*17", true);
+            searchState=2;
+            genre="*17";
+            searchPage=2;
+        }
+        else if (id == R.id.d23) {
+            refresh("search_val=","*BL", true);
+            searchState=2;
+            genre="*BL";
+            searchPage=2;
+        }
+        else if (id == R.id.d24) {
+            refresh("search_val=","*역사", true);
+            searchState=2;
+            genre="*역사";
+            searchPage=2;
+        }
+        else if (id == R.id.d25) {
+            refresh("search_val=","*SF", true);
+            searchState=2;
+            genre="*SF";
+            searchPage=2;
+        }
+        else if (id == R.id.d26) {
+            refresh("search_val=","*TS", true);
+            searchState=2;
+            genre="*TS";
+            searchPage=2;
+        }
+        else if (id == R.id.d27) {
+            refresh("search_val=","*애니화", true);
+            searchState=2;
+            genre="*애니화";
+            searchPage=2;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

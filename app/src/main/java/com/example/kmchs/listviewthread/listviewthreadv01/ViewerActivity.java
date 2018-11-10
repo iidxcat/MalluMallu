@@ -59,7 +59,16 @@ public class ViewerActivity extends AppCompatActivity {
 
        Intent intent=getIntent();
        pos=intent.getIntExtra("pos",0);
-        setTitle(intent.getStringExtra("Title"));
+       String title=intent.getStringExtra("Title");
+       int titleLength=title.length();
+       if(titleLength>18)
+       {
+           StringBuilder builder=new StringBuilder(title);
+           builder.delete(11,titleLength-6);
+           builder.insert(11,"...");
+           title=builder.toString();
+       }
+        setTitle(title);
         StringBuilder builder=new StringBuilder(intent.getStringExtra("ID"));
         builder.delete(0,2);
         String url=builder.toString();

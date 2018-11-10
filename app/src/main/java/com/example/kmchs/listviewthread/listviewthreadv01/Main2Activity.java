@@ -4,18 +4,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -158,6 +157,7 @@ public class Main2Activity extends AppCompatActivity
         edittext=(EditText)findViewById(R.id.edit);
         progressBar=(ProgressBar) findViewById(R.id.progress);
 
+
         //처음 새로고침
         refresh("page=","1",false);
         Log.e("refresh finished","refresh");
@@ -254,6 +254,22 @@ public class Main2Activity extends AppCompatActivity
                     }
                 },null);
         myRequestQueue.add(updateCheck);
+    }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int)event.getRawX(), (int)event.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                }
+            }
+        }
+        return super.dispatchTouchEvent( event );
     }
 
     public void refresh(String type,String value, boolean isClear)
@@ -417,7 +433,13 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else if(searchState!=0) {
+            refresh("page=","1",true);
+            searchState=0;
+            page=2;
+        }
+        else {
             // BackPressedForFinish 클래스의 onBackPressed() 함수를 호출한다.
             onBackPressedExit.onBackPressed();
 
@@ -427,8 +449,6 @@ public class Main2Activity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-       // MenuInflater inflater=getMenuInflater();
-        //inflater.inflate(R.menu.mainmenu,menu);
         getMenuInflater().inflate(R.menu.mainmenu, menu);
         return true;
     }

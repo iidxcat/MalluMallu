@@ -8,6 +8,7 @@
     tools:context="com.example.kmchs.listviewthread.listviewthreadv01.Main2Activity"
     tools:showIn="@layout/app_bar_main2"
     android:id="@+id/rLayout"
+    android:clickable="true"
     android:focusable="true"
     android:focusableInTouchMode="true">
 

@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-
-
-    </group>
+        <item
+            android:title="기록"
+            android:id="@+id/history"/>
 
     <item android:title="태그">
         <menu>

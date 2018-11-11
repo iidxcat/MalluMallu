@@ -22,8 +22,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/edit"
         android:hint="검색"
-        android:textColorHint="#FFEEE4"
-        android:textColor="#FFEEE4"/>
+        android:textColorHint="#959595"
+        android:textColor="#FFEEE4"
+        android:imeOptions="actionSearch"
+        android:maxLines="1"
+        android:inputType="text"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -90,6 +90,7 @@ public class Main2Activity extends AppCompatActivity
     ListView listview;
     ListViewAdapter adapter;
     View footer;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,9 +107,8 @@ public class Main2Activity extends AppCompatActivity
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkSecondary));
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("머루머루");
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -146,6 +146,7 @@ public class Main2Activity extends AppCompatActivity
                 searchState=0;
                 page=2;
                 mSwipeRefreshLayout.setRefreshing(false);
+                toolbar.setTitle("업데이트");
             }
         });
 
@@ -196,6 +197,7 @@ public class Main2Activity extends AppCompatActivity
                 refresh("search_val=", edittext.getText().toString(), true);
                 searchState=1;
                 searchPage=2;
+                toolbar.setTitle("검색 : "+edittext.getText().toString());
             }
         });
         // 에딧텍스트 엔터리스너
@@ -209,6 +211,7 @@ public class Main2Activity extends AppCompatActivity
                         searchPage=2;
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                        toolbar.setTitle("검색 : "+edittext.getText().toString());
                         break;
                     default:
 
@@ -378,6 +381,7 @@ public class Main2Activity extends AppCompatActivity
                             Toast.makeText(Main2Activity.this, "검색 결과 없거나 더 불러올 목록이 없습니다", Toast.LENGTH_SHORT).show();
                         adapter.notifyDataSetChanged();
                         if(isFirstRefresh) {
+                            toolbar.setTitle("업데이트");
                             listview.setAdapter(adapter);
                             isFirstRefresh=false;
                         }
@@ -489,6 +493,7 @@ public class Main2Activity extends AppCompatActivity
             searchState=0;
             page=2;
             edittext.setText(null);
+            toolbar.setTitle("업데이트");
         }
         else {
             // BackPressedForFinish 클래스의 onBackPressed() 함수를 호출한다.
@@ -528,6 +533,7 @@ public class Main2Activity extends AppCompatActivity
 
         if(id==R.id.history)
         {
+            toolbar.setTitle("기록");
             searchState=3;
             adapter=null;
             adapter=new ListViewAdapter(this);
@@ -554,36 +560,42 @@ public class Main2Activity extends AppCompatActivity
             genre="*완결";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 완결");
         } else if (id == R.id.d2) {
             refresh("search_val=","*액션", true);
             searchState=2;
             genre="*액션";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 액션");
         } else if (id == R.id.d3) {
             refresh("search_val=","*이세계", true);
             searchState=2;
             genre="*이세계";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 이세계");
         } else if (id == R.id.d4) {
             refresh("search_val=","*일상치유", true);
             searchState=2;
             genre="*일상치유";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 일상치유");
         } else if (id == R.id.d5) {
             refresh("search_val=","*전생", true);
             searchState=2;
             genre="*전생";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 전생");
         } else if (id == R.id.d6) {
             refresh("search_val=","*추리", true);
             searchState=2;
             genre="*추리";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 추리");
         }
         else if (id == R.id.d7) {
             refresh("search_val=","*판타지", true);
@@ -591,6 +603,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*판타지";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 판타지");
         }
         else if (id == R.id.d8) {
             refresh("search_val=","*학원", true);
@@ -598,6 +611,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*학원";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 학원");
         }
         else if (id == R.id.d9) {
             refresh("search_val=","*공포", true);
@@ -605,6 +619,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*공포";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 공포");
         }
         else if (id == R.id.d10) {
             refresh("search_val=","*개그", true);
@@ -612,6 +627,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*개그";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 개그");
         }
         else if (id == R.id.d11) {
             refresh("search_val=","*게임", true);
@@ -619,6 +635,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*게임";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 게임");
         }
         else if (id == R.id.d12) {
             refresh("search_val=","*도박", true);
@@ -626,6 +643,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*도박";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 도박");
         }
         else if (id == R.id.d13) {
             refresh("search_val=","*드라마", true);
@@ -633,6 +651,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*드라마";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 드라마");
         }
         else if (id == R.id.d14) {
             refresh("search_val=","*라노벨", true);
@@ -640,6 +659,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*라노벨";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 라노벨");
         }
         else if (id == R.id.d15) {
             refresh("search_val=","*러브코미디", true);
@@ -647,6 +667,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*러브코미디";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 러브코미디");
         }
         else if (id == R.id.d16) {
             refresh("search_val=","*먹방", true);
@@ -654,6 +675,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*먹방";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 먹방");
         }
         else if (id == R.id.d17) {
             refresh("search_val=","*백합", true);
@@ -661,6 +683,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*백합";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 백합");
         }
         else if (id == R.id.d18) {
             refresh("search_val=","*여장", true);
@@ -668,6 +691,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*여장";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 여장");
         }
         else if (id == R.id.d19) {
             refresh("search_val=","*순정", true);
@@ -675,6 +699,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*순정";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 순정");
         }
         else if (id == R.id.d20) {
             refresh("search_val=","*스릴러", true);
@@ -682,6 +707,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*스릴러";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 스릴러");
         }
         else if (id == R.id.d21) {
             refresh("search_val=","*스포츠", true);
@@ -689,6 +715,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*스포츠";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 스포츠");
         }
         else if (id == R.id.d22) {
             refresh("search_val=","*17", true);
@@ -696,6 +723,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*17";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 17");
         }
         else if (id == R.id.d23) {
             refresh("search_val=","*BL", true);
@@ -703,6 +731,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*BL";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : BL");
         }
         else if (id == R.id.d24) {
             refresh("search_val=","*역사", true);
@@ -710,6 +739,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*역사";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 역사");
         }
         else if (id == R.id.d25) {
             refresh("search_val=","*SF", true);
@@ -717,6 +747,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*SF";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : SF");
         }
         else if (id == R.id.d26) {
             refresh("search_val=","*TS", true);
@@ -724,6 +755,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*TS";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : TS");
         }
         else if (id == R.id.d27) {
             refresh("search_val=","*애니화", true);
@@ -731,6 +763,7 @@ public class Main2Activity extends AppCompatActivity
             genre="*애니화";
             searchPage=2;
             edittext.setText(null);
+            toolbar.setTitle("태그 : 애니화");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -13,7 +13,8 @@ public class DbManager extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE tableName (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, info TEXT);");
+        // id. 날짜. 만화번호(seq). 화수(제목포함). url(해당화만)
+        db.execSQL("CREATE TABLE tableName (_id INTEGER PRIMARY KEY AUTOINCREMENT, date DATE, seq INTEGER, ep TEXT, url TEXT);");
     }
 
     @Override

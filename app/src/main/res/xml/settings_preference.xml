@@ -22,6 +22,11 @@
         android:key="zoom"
         android:title="줌 활성화"/>
 
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="hideToolbar"
+        android:title="스크롤 할때 제목 숨기기"/>
+
     <Preference
         android:title="기록 삭제"
         android:key="clearHistory"/>

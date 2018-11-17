@@ -1,13 +1,18 @@
 package com.example.kmchs.listviewthread.listviewthreadv01;
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.design.widget.AppBarLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.webkit.URLUtil;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -54,6 +60,14 @@ public class ViewerActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.viewerToolbar);
         setSupportActionBar(toolbar);
 
+        if(sharedPref.getBoolean("hideToolbar",true))
+        {
+        AppBarLayout.LayoutParams params =
+                (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
+        params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+                | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+        }
+
         isZoomEnabled= sharedPref.getBoolean("zoom",false);
 
         webView=(WebView)findViewById(R.id.webview);
@@ -65,7 +79,6 @@ public class ViewerActivity extends AppCompatActivity {
             webSettings.setBuiltInZoomControls(true);
             webSettings.setSupportZoom(true);
         }
-
 
        Intent intent=getIntent();
        pos=intent.getIntExtra("pos",0);
@@ -88,8 +101,8 @@ public class ViewerActivity extends AppCompatActivity {
         registerForContextMenu(webView);
         webView.loadUrl("https://aqours.faith/call_frame?&o="+url+"&what=list");
 
-
     }
+
     public void onBackPressed()
     {
         Intent resultIntent=new Intent();
@@ -152,26 +165,51 @@ public class ViewerActivity extends AppCompatActivity {
                     .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem menuItem) {
+                            int permissionCheck = ContextCompat.checkSelfPermission(ViewerActivity.this,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                                    Toast.makeText(ViewerActivity.this, "다운로드를 위해 권한 승인이 필요합니다.", Toast.LENGTH_LONG).show();
+                                    ActivityCompat.requestPermissions(ViewerActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                                    return false;
+                                }
+                                else {
+                                    String DownloadImageURL = webViewHitTestResult.getExtra();
+                                    if (URLUtil.isValidUrl(DownloadImageURL)) {
 
-                            String DownloadImageURL = webViewHitTestResult.getExtra();
-                            StringBuilder builder=new StringBuilder(DownloadImageURL);
-                            //builder.replace("https://lovelive.aqours.faith/"," ");
-                            if(URLUtil.isValidUrl(DownloadImageURL)){
+                                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(DownloadImageURL));
+                                        request.allowScanningByMediaScanner();
+                                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title + ".jpg");
 
-                                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(DownloadImageURL));
-                                request.allowScanningByMediaScanner();
-                                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,title+DownloadImageURL);
+                                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                                        downloadManager.enqueue(request);
 
-                                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                                DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                                downloadManager.enqueue(request);
-
-                                Toast.makeText(ViewerActivity.this,"다운로드 시작..",Toast.LENGTH_LONG).show();
+                                        Toast.makeText(ViewerActivity.this, "다운로드 시작...", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(ViewerActivity.this, "Error", Toast.LENGTH_LONG).show();
+                                    }
+                                    return false;
+                                }
                             }
                             else {
-                                Toast.makeText(ViewerActivity.this,"Error",Toast.LENGTH_LONG).show();
+                                String DownloadImageURL = webViewHitTestResult.getExtra();
+                                if (URLUtil.isValidUrl(DownloadImageURL)) {
+
+                                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(DownloadImageURL));
+                                    request.allowScanningByMediaScanner();
+                                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title + ".jpg");
+
+                                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                                    DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                                    downloadManager.enqueue(request);
+
+                                    Toast.makeText(ViewerActivity.this, "다운로드 시작..", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(ViewerActivity.this, "Error", Toast.LENGTH_LONG).show();
+                                }
+                                return false;
                             }
-                            return false;
                         }
                     });
         }

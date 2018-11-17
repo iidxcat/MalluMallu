@@ -79,6 +79,7 @@ public class Main2Activity extends AppCompatActivity
     int searchState=0;
     boolean isUsingData=false;
     boolean dataSaver=false;
+    boolean isActivityDestroyed=false;
     SharedPreferences sharedPref;
     PrefManager prefManager;
     Context context;
@@ -124,18 +125,20 @@ public class Main2Activity extends AppCompatActivity
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null) {
-            // connected to the internet
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
-                // connected to wifi
-            } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-                // connected to mobile data
-                Toast.makeText(this, "데이터를 사용중입니다.", Toast.LENGTH_SHORT).show();
-                isUsingData=true;
+                // connected to the internet
+                if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                    // connected to wifi
+                } else if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
+                    // connected to mobile data
+                    if(!isActivityDestroyed)
+                    Toast.makeText(this, "데이터를 사용중입니다.", Toast.LENGTH_SHORT).show();
+                    isUsingData = true;
+                }
+            } else {
+                // not connected to the internet
+                Toast.makeText(this, "네트워크가 꺼져있습니다.", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            // not connected to the internet
-            Toast.makeText(this, "네트워크가 꺼져있습니다.", Toast.LENGTH_SHORT).show();
-        }
+
         myRequestQueue = Volley.newRequestQueue(this);
 
         final SwipeRefreshLayout mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
@@ -264,31 +267,33 @@ public class Main2Activity extends AppCompatActivity
         }) ;
 
         //업데이트 체크
-        StringRequest updateCheck=new StringRequest(Request.Method.GET, "https://raw.githubusercontent.com/iidxcat/MalluMallu/master/version.txt",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        String rawVersion=Jsoup.parse(response).text();
+        if(!isActivityDestroyed) {
+            StringRequest updateCheck = new StringRequest(Request.Method.GET, "https://raw.githubusercontent.com/iidxcat/MalluMallu/master/version.txt",
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            String rawVersion = Jsoup.parse(response).text();
 
-                        StringBuilder updateBuilder=new StringBuilder(rawVersion);
-                        updateBuilder.delete(0,5);
-                        int isForceUpdate=Integer.parseInt(updateBuilder.toString());
-                        updateBuilder=new StringBuilder(rawVersion);
-                        updateBuilder.delete(4,6);
+                            StringBuilder updateBuilder = new StringBuilder(rawVersion);
+                            updateBuilder.delete(0, 5);
+                            int isForceUpdate = Integer.parseInt(updateBuilder.toString());
+                            updateBuilder = new StringBuilder(rawVersion);
+                            updateBuilder.delete(4, 6);
 
-                        int lastVersion=Integer.parseInt(updateBuilder.toString());
-                        if(nowVersion<lastVersion)
-                            Toast.makeText(Main2Activity.this, "업데이트가 있습니다.", Toast.LENGTH_SHORT).show();
-                        else
-                            Toast.makeText(Main2Activity.this, "최신버전 입니다.", Toast.LENGTH_SHORT).show();
+                            int lastVersion = Integer.parseInt(updateBuilder.toString());
+                            if (nowVersion < lastVersion)
+                                Toast.makeText(Main2Activity.this, "업데이트가 있습니다.", Toast.LENGTH_SHORT).show();
+                            else
+                                Toast.makeText(Main2Activity.this, "최신버전 입니다.", Toast.LENGTH_SHORT).show();
 
-                        if(isForceUpdate==1) {
-                            Toast.makeText(Main2Activity.this, "업데이트 후 실행해주세요.", Toast.LENGTH_LONG).show();
-                            finish();
+                            if (isForceUpdate == 1) {
+                                Toast.makeText(Main2Activity.this, "업데이트 후 실행해주세요.", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
                         }
-                    }
-                },null);
-        myRequestQueue.add(updateCheck);
+                    }, null);
+            myRequestQueue.add(updateCheck);
+        }
     }
 
     //키보드숨기기
@@ -770,4 +775,16 @@ public class Main2Activity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList("episodeUrlString", episodeUrlString);
+        outState.putStringArrayList("episodeString",episodeString);
+    }
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        episodeUrlString = savedInstanceState.getStringArrayList("episodeUrlString");
+        episodeString = savedInstanceState.getStringArrayList("episodeString");
+        isActivityDestroyed=true;
+    }
+
 }

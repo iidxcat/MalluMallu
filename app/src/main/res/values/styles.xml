@@ -32,4 +32,6 @@
         <item name="android:textColorSecondary">@color/lightgray</item>
     </style>
 
+
+
 </resources>
